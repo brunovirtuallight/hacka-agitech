@@ -1,0 +1,97 @@
+doctype html
+html(lang='en')
+  head
+    //- meta(charset='UTF-8')
+    //- meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    //- meta(http-equiv='X-UA-Compatible', content='ie=edge')
+    //- link(rel='stylesheet', href='./node_modules/materialize-css/dist/css/materialize.min.css')
+    //- link(rel='stylesheet', href='./assets/css/materialize.css')
+    //- link(rel='stylesheet', href='./assets/css/style.css')
+    //- link(rel='stylesheet', href='./node_modules/materialize-social/css/materialize.min.css')
+    //- link(href='https://fonts.googleapis.com/icon?family=Material+Icons', rel='stylesheet')
+    //- link(rel='stylesheet', href='./assets/css/materialize.css')
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    meta(http-equiv='X-UA-Compatible', content='ie=edge')
+    link(rel='stylesheet', href='./stylesheets/materialize-css/dist/css/materialize.min.css')
+    link(rel='stylesheet', href='./assets/css/materialize.css')
+    //- link(rel='stylesheet', href='./assets/css/style.css')
+    link(rel='stylesheet', href='./node_modules/materialize-social/css/materialize.min.css')
+    link(href='https://fonts.googleapis.com/icon?family=Material+Icons', rel='stylesheet')
+    link(rel='stylesheet', href='./stylesheets/style.css')
+    link(rel='stylesheet', href='./../assets/css/materialize.css')
+    title Login
+  body
+    header
+      nav(style='position: relative;')
+        .nav-wrapper.blue.darken-4
+          a.brand-logo.center(href='#')
+            | searchAmbev
+          ul#nav-mobile.right.hide-on-med-and-down
+            li
+              a(href='sass.html') Sass
+            li
+              a(href='badges.html') Components
+            li
+              a(href='collapsible.html') JavaScript
+    main(id='main_pesquisa' class='main-container-pesquisa')
+      .row
+        form.col.s12
+          .input-field.col.s12
+            i.material-icons.prefix search
+            textarea#icon_prefix2.materialize-textarea
+            label(for='icon_prefix2') Faça sua busca
+  script(src='./javascripts/jquery.min.js')
+  script(src='./stylesheets/materialize-css/dist/js/materialize.min.js')
+
+  script(type='text/javascript').
+
+    $(document).ready(function(){
+
+      $('#icon_prefix2').change(function(){
+
+        var text = $(this).val()
+        
+        // Submit ajax para recuperar os dados da breja pesquisada
+        var promise = $.ajax({
+          url: 'get_beer/' + text
+        })
+
+        promise.then(function(result){
+
+          $(result).each(function(index, value){
+
+            var html = '<div class="row">'
+              html += '<div class="row">'
+                html += '<div class="col s12 m7">'
+                  html += '<div class="card horizontal" style="padding: 10px;">'
+                    html += '<div class="card-image" style="display: flex; align-items: center; justify-content: center;">'
+                      //- html += '<img src="' + value.detalhes.imagem + '" />'
+                      html += '<img src="http://mthumbs.buscape.com.br/cerveja/brahma-extra-long-neck-355-ml-1-unidade_600x600-PU5d982_1.jpg" />'                      
+                      html += '<div class="card-stacked">'
+                        html += '<div class="card-content">'
+                          html += '<h4>'+value.title+'</h4>'
+                          html += '<h5>'+value.detalhes.estilo+'</h5>'
+                        html += '<div class="card-action">'
+                          html += '<a href="#" style="color: red;">A partir de '+value.mediumPrice+'</a>'
+                        html += '</div>'
+                      html += '</div>'
+                    html += '</div>'
+                  html += '</div>'
+                html += '</div>'
+              html += '</div>'
+            html += '</div>'
+
+            $('#main_pesquisa').append(html)
+            
+
+          });
+
+          $(".horizontal").load();
+
+        })
+
+
+      })
+
+    })
