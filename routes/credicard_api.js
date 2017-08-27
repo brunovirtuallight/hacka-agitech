@@ -6,14 +6,13 @@ var CLIENT_ID_AGILLITAS = '9dbdbd34-56f6-3cd2-8e3a-5c245a54ccf8'              //
 var CLIENT_SECRET_AGILLITAS = 'dd3b043e-4b1a-3166-a980-bb3de5fdcc57'          // ID para conceder autorizacao para request http
 var ACCESS_TOKEN_AGILLITAS = '64b932c2-4f6c-3625-846d-1376348abb73'           // ID de user para conceder autorizacao para request http a um usuario
 
-
 module.exports = function(app){
 
   // Importa modulos nativos
   var rp = require('request-promise');
   var request = require('request');
 
-  // Custom Modules
+  // Carrega Database
   var db = require('./../libs/connectdb.js')()
   
   // Modulos da VISA
@@ -27,6 +26,24 @@ module.exports = function(app){
   /*
     ### MERGE VISA CHECKOUT => AGILLITAS ###
   */
+
+  app.get('/teste/:proxy', (req, res) => {
+
+    var proxy = String(req.params.proxy)
+    var ProxyCredcards = db.model('ProxyCredcards')
+    
+    ProxyCredcards.find({proxy: proxy}, function(err, docs){
+      if(err){
+          throw err
+      }
+
+      res.send(docs);
+      console.log(docs)
+
+      // console.log(docs[0][0].idCartao)
+      
+    })
+  })
 
   app.get('/cybersource_agillitas_sales/:idCartao/:valor', (req, res) => {
 
@@ -65,46 +82,60 @@ module.exports = function(app){
           console.log('Iniciando processamento na Agillitas ...')
           console.log('====================================')
 
+          var ProxyCredcards = db.model('ProxyCredcards')
+          
+          ProxyCredcards.find({idCartao: idCartao}, function(err, docs){
+            if(err){
+                throw err
+            }
 
-          var url = 'https://api-visa.sensedia.com/sandbox/visa/agillitas/v1/cartoes/' + idCartao + "/saldo"
+            // res.send(docs);
+            // console.log(docs)
+            // process.exit()
 
-          // Configura o request
-          var requestOptions = {
-            uri : url,
-            method: 'PUT',
-            resolveWithFullResponse : true,
-            timeout: 120000,
-            headers: {
-              access_token:   ACCESS_TOKEN_AGILLITAS,
-              client_id:      CLIENT_ID_AGILLITAS
-            },
-            body: {
-              "saldo" : {
-                "valor": valor
-              }
-            },
-            json: true
-          }
+            var idCartao = docs[0].proxy;
+            
+            var url = 'https://api-visa.sensedia.com/sandbox/visa/agillitas/v1/cartoes/' + idCartao + "/saldo"
 
-          console.log(requestOptions)
-          console.log('Processando valor ' + valor)
-          console.log('====================================')
+            // Configura o request
+            var requestOptions = {
+              uri : url,
+              method: 'PUT',
+              resolveWithFullResponse : true,
+              timeout: 120000,
+              headers: {
+                access_token:   ACCESS_TOKEN_AGILLITAS,
+                client_id:      CLIENT_ID_AGILLITAS
+              },
+              body: {
+                "saldo" : {
+                  "valor": valor
+                }
+              },
+              json: true
+            }
 
-          // Envia o request
-          rp(requestOptions).then(function(response){
-
-            var body = response.body
-
-            console.log('Processamento na Agillitas finalizada !')
-            console.log('statusCode: ' + response.statusCode)
+            console.log(requestOptions)
+            console.log('Processando valor ' + valor)
             console.log('====================================')
-            console.log(body)
 
-            resolve(body)
+            // Envia o request
+            rp(requestOptions).then(function(response){
 
-            res.send('Operacao realizada com sucesso')
+              var body = response.body
 
+              console.log('Processamento na Agillitas finalizada !')
+              console.log('statusCode: ' + response.statusCode)
+              console.log('====================================')
+
+              resolve(body)
+
+              res.send('Operacao realizada com sucesso')
+
+            })
           })
+
+
 
         }
         

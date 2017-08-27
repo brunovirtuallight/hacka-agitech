@@ -17,30 +17,6 @@ var port = 0;
 
 // console.log('Porta para o banco de dados: '+port)
 
-// module.exports = function(){
-
-// 	var mysql      = require('mysql');
-// 	var connection = mysql.createConnection({
-// 		host     : 'localhost',
-// 		user     : 'root',
-// 		password : '',
-// 		database : 'hacka_ima',
-// 		port: port
-// 	});
-
-// 	connection.connect(function(err) {
-// 		if (err) {
-// 			console.error('error connecting: ' + err.stack);
-// 			return;
-// 		}
-
-// 		console.log('Conexão realizada com sucesso!');
-
-// 	});
-
-// 	return connection
-// }
-
 module.exports = function(){
 
 	var mongoose = require('mongoose')
@@ -48,31 +24,38 @@ module.exports = function(){
 
 	var uri = 'mongodb://heroku_68zc1kd4:i4shak80loe4avq30n20ik1ak5@ds129013.mlab.com:29013/heroku_68zc1kd4'
 
-	mongoose.connect(uri).then(function(){
+	var connState = mongoose.connection.readyState
 
-		console.log('MongoDb conectado com sucesso!!!')
+	if(connState == 0){
 
-		// ### Registra Schemas ###
+		mongoose.connect(uri).then(function(){
 
-		// Perguntas
-		var perguntasSchema = new mongoose.Schema({
-			Question: String,
-			Tip: String,
-			Required: String,
-			Options: Array,
-			Form: Number
+			console.log('MongoDb conectado com sucesso!!!')
+
+			// ### Registra Schemas ###
+			
+			// Game Datas
+			var gameDatasSchema = new mongoose.Schema({
+				cardNumber : String,
+				slots : [
+					{titleId: String, prefab: String, ocuppied: String}
+				]
+				
+			})
+
+			// Proxycredcards
+			var proxyCredcards = new mongoose.Schema({
+				proxy: String, idCartao: String
+				
+			})
+
+			mongoose.model('GameDatas', gameDatasSchema)
+			mongoose.model('ProxyCredcards', proxyCredcards)
+
 		})
 
-		// Categorias
-		var categoriasSchema = new mongoose.Schema({
-			Categoria: String
-		})
+	}
 
-		mongoose.model('Perguntas', perguntasSchema)
-		mongoose.model('Categorias', categoriasSchema)
-
-
-	})
 
 	return mongoose.connection
 
