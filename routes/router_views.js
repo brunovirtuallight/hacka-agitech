@@ -2,8 +2,12 @@
 
 module.exports = function(app) {
 
-  app.get('/dashboards', (req, res) => {
-    res.render('dashboards')
+  app.get('/dashboard_control', (req, res) => {
+    res.render('dashboard_control')
+  })
+
+  app.get('/login', (req, res) => {
+    res.render('login')
   })
 
 }

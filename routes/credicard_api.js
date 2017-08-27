@@ -81,7 +81,7 @@ module.exports = function(app){
           console.log(responseCode)
           console.log('Iniciando processamento na Agillitas ...')
           console.log('====================================')
-
+          
           var ProxyCredcards = db.model('ProxyCredcards')
           
           ProxyCredcards.find({idCartao: idCartao}, function(err, docs){
