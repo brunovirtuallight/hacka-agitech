@@ -37,10 +37,7 @@ module.exports = function(){
 			// Game Datas
 			var gameDatasSchema = new mongoose.Schema({
 				cardNumber : String,
-				slots : [
-					{titleId: String, prefab: String, ocuppied: String}
-				]
-				
+				slots : {titleId: String, prefab: String, ocuppied: String}
 			})
 
 			// Proxycredcards
